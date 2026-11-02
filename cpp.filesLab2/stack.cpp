@@ -1,5 +1,6 @@
+#include "../h.filesLab2/stack.h"
 #include "../h.filesLab1/Stack.h"
-#include "stack.h"
+
 #include <string>
 #include <stdexcept>
 

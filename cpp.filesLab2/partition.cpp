@@ -1,5 +1,4 @@
-#include "h.filesLab2/partition.h"
-
+#include "../h.filesLab2/partition.h"
 #include <cmath>
 
 using namespace std;

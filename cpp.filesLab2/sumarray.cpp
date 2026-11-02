@@ -1,9 +1,9 @@
-#include <h.filesLab2/sumarray.h>
+#include "../h.filesLab2/sumarray.h"
 #include <string>
 
 using namespace std;
 
-Subarray Sum(MyArray& arr, int target_sum) {
+Subarray Sum(const MyArray& arr, int target_sum) {
     Subarray res;
     res.found = false;
     res.start_index = -1;

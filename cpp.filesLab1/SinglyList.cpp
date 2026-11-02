@@ -1,4 +1,4 @@
-#include "../h.files/SinglyList.h"
+#include "../h.filesLab1/SinglyList.h"
 #include <iostream>                
 
 using namespace std;

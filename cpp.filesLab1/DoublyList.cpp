@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../h.files/DoublyList.h"
+#include "../h.filesLab1/DoublyList.h"
 
 using namespace std;
 

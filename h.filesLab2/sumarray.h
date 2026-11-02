@@ -1,7 +1,7 @@
 #ifndef SUMARRAY_H
 #define SUMARRAY_H
 
-#include "h.filesLab1/Array.h"
+#include "../h.filesLab1/Array.h"
 #include <vector>
 
 struct Subarray{

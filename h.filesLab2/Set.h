@@ -2,7 +2,7 @@
 #define SET_H
 
 #include <string>
-#include "h.filesLab1/SinglyList.h"
+#include "../h.filesLab1/SinglyList.h"
 
 // Так как у нас множество, будем использовать хеш-таблицу - массив, ячейками которых являются односвязные списки (чтобы все операции выполнялись за O(1))
 struct Set{

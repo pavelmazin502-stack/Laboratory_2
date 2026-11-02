@@ -1,4 +1,4 @@
-#include "../h.files/Array.h"
+#include "../h.filesLab1/Array.h"
 #include <iostream>
 
 using namespace std;
