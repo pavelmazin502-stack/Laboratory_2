@@ -3,64 +3,80 @@
 
 using namespace std;
 
-void LFUCache::init(size_t cap) {
+void LFUCache::init(int cap) {
     capacity = cap;
-    size = 0;
-    timer = 0;
-    entries = new LFUEntry[capacity];
+    min_freq = 0;
+    key_map.clear();
+    freq_map.clear();
 }
 
-void LFUCache::destroy() {
-    delete[] entries;
-    entries = nullptr;
-    size = 0;
-    capacity = 0;
+void LFUCache::update_freq(list<Node>::iterator it) {
+    int old_freq = it->freq;
+    int new_freq = old_freq + 1;
+    string k = it->key;
+    string v = it->val;
+
+    // Удаляем из старого частотного списка
+    freq_map[old_freq].erase(it);
+    if (freq_map[old_freq].empty()) {
+        freq_map.erase(old_freq);
+        if (min_freq == old_freq) {
+            min_freq = new_freq;
+        }
+    }
+
+    // Вставляем в голову нового частотного списка
+    freq_map[new_freq].push_front({k, v, new_freq});
+    key_map[k] = freq_map[new_freq].begin();
+}
+
+void LFUCache::set(const string& key, const string& val) {
+    if (capacity <= 0) return;
+
+    // Если ключ уже есть — обновляем значение и повышаем частоту
+    if (key_map.find(key) != key_map.end()) {
+        auto it = key_map[key];
+        it->val = val;
+        update_freq(it);
+        return;
+    }
+
+    // Если кэш заполнен — вытесняем наименее часто используемый элемент
+    if (static_cast<int>(key_map.size()) >= capacity) {
+        auto& min_list = freq_map[min_freq];
+        // Последний элемент в списке — самый старый при данной частоте (LRU)
+        string evict_key = min_list.back().key;
+        min_list.pop_back();
+        if (min_list.empty()) {
+            freq_map.erase(min_freq);
+        }
+        key_map.erase(evict_key);
+    }
+
+    // Вставляем новый элемент со счётчиком обращений 1
+    min_freq = 1;
+    freq_map[1].push_front({key, val, 1});
+    key_map[key] = freq_map[1].begin();
 }
 
 string LFUCache::get(const string& key) {
-    timer++;
-    for (size_t i = 0; i < size; ++i) {
-        if (entries[i].key == key) {
-            entries[i].freq++;
-            entries[i].time_step = timer;
-            return entries[i].val;
-        }
-    }
-    return "";
-}
-
-void LFUCache::put(const string& key, const string& val) {
-    if (capacity == 0) return;
-    timer++;
-
-    for (size_t i = 0; i < size; ++i) {
-        if (entries[i].key == key) {
-            entries[i].val = val;
-            entries[i].freq++;
-            entries[i].time_step = timer;
-            return;
-        }
+    if (key_map.find(key) == key_map.end()) {
+        return "-1";
     }
 
-    if (size < capacity) {
-        entries[size] = {key, val, 1, timer};
-        size++;
-    } else {
-        size_t lfu_idx = 0;
-        for (size_t i = 1; i < size; ++i) {
-            if (entries[i].freq < entries[lfu_idx].freq ||
-               (entries[i].freq == entries[lfu_idx].freq && entries[i].time_step < entries[lfu_idx].time_step)) {
-                lfu_idx = i;
-            }
-        }
-        entries[lfu_idx] = {key, val, 1, timer};
-    }
+    auto it = key_map[key];
+    string val = it->val;
+    update_freq(it);
+    return val;
 }
 
 void LFUCache::print() const {
-    cout << "LFU Cache [ ";
-    for (size_t i = 0; i < size; ++i) {
-        cout << "(" << entries[i].key << ":" << entries[i].val << " f=" << entries[i].freq << ") ";
+    cout << "LFU Cache (size=" << key_map.size() << "/" << capacity << "):\n";
+    for (const auto& p : freq_map) {
+        cout << "  Freq " << p.first << ": ";
+        for (const auto& node : p.second) {
+            cout << "[" << node.key << ": " << node.val << "] ";
+        }
+        cout << "\n";
     }
-    cout << "]\n";
 }
